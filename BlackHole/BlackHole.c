@@ -2139,9 +2139,9 @@ static OSStatus	BlackHole_GetDevicePropertyData(AudioServerPlugInDriverRef inDri
 			theNumberItemsToFetch = inDataSize / sizeof(AudioValueRange);
 			
 			//	clamp it to the number of items we have
-			if(theNumberItemsToFetch > 6)
+			if(theNumberItemsToFetch > 8)
 			{
-				theNumberItemsToFetch = 6;
+				theNumberItemsToFetch = 8;
 			}
 			
 			//	fill out the return array
@@ -2610,9 +2610,9 @@ static OSStatus	BlackHole_GetStreamPropertyData(AudioServerPlugInDriverRef inDri
 			theNumberItemsToFetch = inDataSize / sizeof(AudioStreamRangedDescription);
 			
 			//	clamp it to the number of items we have
-			if(theNumberItemsToFetch > 6)
+			if(theNumberItemsToFetch > 8)
 			{
-				theNumberItemsToFetch = 6;
+				theNumberItemsToFetch = 8;
 			}
 			
 			//	fill out the return array
