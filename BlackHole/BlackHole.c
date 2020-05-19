@@ -334,7 +334,9 @@ static OSStatus	BlackHole_PerformDeviceConfigurationChange(AudioServerPlugInDriv
                    && (inChangeAction != 88200)
                    && (inChangeAction != 96000)
                    && (inChangeAction != 176400)
-                   && (inChangeAction != 192000),
+                   && (inChangeAction != 192000)
+                   && (inChangeAction != 384000)
+                   && (inChangeAction != 480000),
                    theAnswer = kAudioHardwareBadObjectError, Done, "BlackHole_PerformDeviceConfigurationChange: bad sample rate");
 	
 	//	lock the state mutex
@@ -2173,6 +2175,16 @@ static OSStatus	BlackHole_GetDevicePropertyData(AudioServerPlugInDriverRef inDri
                 ((AudioValueRange*)outData)[5].mMinimum = 192000.0;
                 ((AudioValueRange*)outData)[5].mMaximum = 192000.0;
             }
+            if(theNumberItemsToFetch > 6)
+            {
+                ((AudioValueRange*)outData)[6].mMinimum = 384000.0;
+                ((AudioValueRange*)outData)[6].mMaximum = 384000.0;
+            }
+            if(theNumberItemsToFetch > 7)
+            {
+                ((AudioValueRange*)outData)[7].mMinimum = 480000.0;
+                ((AudioValueRange*)outData)[7].mMaximum = 480000.0;
+            }
 			
 			//	report how much we wrote
 			*outDataSize = theNumberItemsToFetch * sizeof(AudioValueRange);
@@ -2276,7 +2288,15 @@ static OSStatus	BlackHole_SetDevicePropertyData(AudioServerPlugInDriverRef inDri
 
 			//	check the arguments
 			FailWithAction(inDataSize != sizeof(Float64), theAnswer = kAudioHardwareBadPropertySizeError, Done, "BlackHole_SetDevicePropertyData: wrong size for the data for kAudioDevicePropertyNominalSampleRate");
-			FailWithAction((*((const Float64*)inData) != 44100.0) && (*((const Float64*)inData) != 48000.0) && (*((const Float64*)inData) != 88200.0) && (*((const Float64*)inData) != 96000.0) && (*((const Float64*)inData) != 176400.0) && (*((const Float64*)inData) != 192000.0), theAnswer = kAudioHardwareIllegalOperationError, Done, "BlackHole_SetDevicePropertyData: unsupported value for kAudioDevicePropertyNominalSampleRate");
+			FailWithAction((*((const Float64*)inData) != 44100.0) &&
+			 (*((const Float64*)inData) != 48000.0) &&
+			 (*((const Float64*)inData) != 88200.0) &&
+			 (*((const Float64*)inData) != 96000.0) &&
+			 (*((const Float64*)inData) != 176400.0) &&
+			 (*((const Float64*)inData) != 192000.0) &&
+			 (*((const Float64*)inData) != 384000.0) &&
+			 (*((const Float64*)inData) != 480000.0),
+			 theAnswer = kAudioHardwareIllegalOperationError, Done, "BlackHole_SetDevicePropertyData: unsupported value for kAudioDevicePropertyNominalSampleRate");
 			
 			//	make sure that the new value is different than the old value
 			pthread_mutex_lock(&gPlugIn_StateMutex);
@@ -2674,6 +2694,32 @@ static OSStatus	BlackHole_GetStreamPropertyData(AudioServerPlugInDriverRef inDri
                 ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMinimum = 192000.0;
                 ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMaximum = 192000.0;
             }
+            if(theNumberItemsToFetch > 6)
+            {
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mSampleRate = 384000.0;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFormatID = kAudioFormatLinearPCM;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBytesPerPacket = BYTES_PER_FRAME;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFramesPerPacket = 1;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBytesPerFrame = BYTES_PER_FRAME;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mChannelsPerFrame = NUMBER_OF_CHANNELS;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBitsPerChannel = BITS_PER_CHANNEL;
+                ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMinimum = 384000.0;
+                ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMaximum = 384000.0;
+            }
+            if(theNumberItemsToFetch > 7)
+            {
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mSampleRate = 480000.0;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFormatID = kAudioFormatLinearPCM;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBytesPerPacket = BYTES_PER_FRAME;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mFramesPerPacket = 1;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBytesPerFrame = BYTES_PER_FRAME;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mChannelsPerFrame = NUMBER_OF_CHANNELS;
+                ((AudioStreamRangedDescription*)outData)[5].mFormat.mBitsPerChannel = BITS_PER_CHANNEL;
+                ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMinimum = 480000.0;
+                ((AudioStreamRangedDescription*)outData)[5].mSampleRateRange.mMaximum = 480000.0;
+            }
 			
 			//	report how much we wrote
 			*outDataSize = theNumberItemsToFetch * sizeof(AudioStreamRangedDescription);
@@ -2756,7 +2802,15 @@ static OSStatus	BlackHole_SetStreamPropertyData(AudioServerPlugInDriverRef inDri
 			FailWithAction(((const AudioStreamBasicDescription*)inData)->mBytesPerFrame != BYTES_PER_FRAME, theAnswer = kAudioDeviceUnsupportedFormatError, Done, "BlackHole_SetStreamPropertyData: unsupported bytes per frame for kAudioStreamPropertyPhysicalFormat");
 			FailWithAction(((const AudioStreamBasicDescription*)inData)->mChannelsPerFrame != NUMBER_OF_CHANNELS, theAnswer = kAudioDeviceUnsupportedFormatError, Done, "BlackHole_SetStreamPropertyData: unsupported channels per frame for kAudioStreamPropertyPhysicalFormat");
 			FailWithAction(((const AudioStreamBasicDescription*)inData)->mBitsPerChannel != BITS_PER_CHANNEL, theAnswer = kAudioDeviceUnsupportedFormatError, Done, "BlackHole_SetStreamPropertyData: unsupported bits per channel for kAudioStreamPropertyPhysicalFormat");
-			FailWithAction((((const AudioStreamBasicDescription*)inData)->mSampleRate != 44100.0) && (((const AudioStreamBasicDescription*)inData)->mSampleRate != 48000.0) && (((const AudioStreamBasicDescription*)inData)->mSampleRate != 88200.0) && (((const AudioStreamBasicDescription*)inData)->mSampleRate != 96000.0) && (((const AudioStreamBasicDescription*)inData)->mSampleRate != 176400.0) && (((const AudioStreamBasicDescription*)inData)->mSampleRate != 192000.0), theAnswer = kAudioHardwareIllegalOperationError, Done, "BlackHole_SetStreamPropertyData: unsupported sample rate for kAudioStreamPropertyPhysicalFormat");
+			FailWithAction((((const AudioStreamBasicDescription*)inData)->mSampleRate != 44100.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 48000.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 88200.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 96000.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 176400.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 192000.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 384000.0) &&
+			(((const AudioStreamBasicDescription*)inData)->mSampleRate != 480000.0),
+			theAnswer = kAudioHardwareIllegalOperationError, Done, "BlackHole_SetStreamPropertyData: unsupported sample rate for kAudioStreamPropertyPhysicalFormat");
 			
 			//	If we made it this far, the requested format is something we support, so make sure the sample rate is actually different
 			pthread_mutex_lock(&gPlugIn_StateMutex);

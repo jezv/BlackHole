@@ -79,6 +79,7 @@
 //    - a device
 //        - supports 44100, 48000, 88200, 96000, 176400 and 192000 sample rates
 //        - provides a rate scalar of 1.0 via hard coding
+//        - also added some experimental support for 384kHz and 480kHz
 //    - a single output stream
 //        - supports 16 channels of 32 bit float LPCM samples
 //        - writes to ring buffer
